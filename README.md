@@ -42,6 +42,8 @@ This structure follows the **MVC (Model-View-Controller)** pattern similar to Ex
 - **Scalable Structure**: Similar to Express.js, making it familiar for Node.js developers
 - **RESTful API**: Following REST principles with proper HTTP methods and status codes
 
+
+
 ## API Endpoints
 
 ### Health Check
@@ -58,6 +60,15 @@ This structure follows the **MVC (Model-View-Controller)** pattern similar to Ex
 
 ### Prerequisites
 - Go 1.25.0 or later
+
+# Environmental Variable setup
+Following environmental Variables should be available for the propery functioning
+of service.
+``` 
+IDP_ADDRESS=https://localhost:9443
+IDP_USERNAME=user
+IDP_PASSWORD=password
+```
 
 ### Installation & Running
 
