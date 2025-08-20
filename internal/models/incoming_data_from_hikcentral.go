@@ -1,12 +1,16 @@
 package models
 
 type IncomingDataFromHikCentral struct {
-	ID          string `json:"id"`
+	UserID      string `json:"user_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	DeviceID    string `json:"device_id"`
 }
 
 func (data *IncomingDataFromHikCentral) GetUserId() (string, error) {
-	// Implement your logic to extract user ID from the incoming data
-	return data.ID, nil
+	return data.UserID, nil
+}
+
+func (data *IncomingDataFromHikCentral) GetDeviceId() (string, error) {
+	return data.DeviceID, nil
 }

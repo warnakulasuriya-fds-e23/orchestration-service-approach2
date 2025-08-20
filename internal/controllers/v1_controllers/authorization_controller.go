@@ -2,12 +2,15 @@ package v1_controllers
 
 import (
 	"crypto/tls"
-	"encoding/json"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tidwall/gjson"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/models"
 )
 
@@ -23,6 +26,12 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	userID, err := reqBody.GetUserId()
 	if err != nil {
 		c.JSON(500, gin.H{"error while getting user ID from request body": err.Error()})
+		return
+	}
+
+	deviceId, err := reqBody.GetDeviceId()
+	if err != nil {
+		c.JSON(500, gin.H{"error while getting device ID from request body": err.Error()})
 		return
 	}
 
@@ -51,12 +60,27 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 		c.JSON(resp.StatusCode, gin.H{"error": "Failed to authorize user"})
 		return
 	}
-
-	var res map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		c.JSON(500, gin.H{"error while decoding response from IDP": err.Error()})
+	resBodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(500, gin.H{"error while reading response body": err.Error()})
 		return
 	}
+	log.Println(deviceId)
+	resBody := gjson.ParseBytes(resBodyBytes)
+	lengthOfRoles := resBody.Get("roles.#").Int()
+	var roles []models.WSO2IDPRoleObject
+	for i := int64(0); i < lengthOfRoles; i++ {
+		roles = append(roles, models.WSO2IDPRoleObject{
+			Ref:             resBody.Get("roles." + strconv.Itoa(int(i)) + ".$ref").String(),
+			AudienceDisplay: resBody.Get("roles." + strconv.Itoa(int(i)) + ".audienceDisplay").String(),
+			AudienceType:    resBody.Get("roles." + strconv.Itoa(int(i)) + ".audienceType").String(),
+			AudienceValue:   resBody.Get("roles." + strconv.Itoa(int(i)) + ".audienceValue").String(),
+			Display:         resBody.Get("roles." + strconv.Itoa(int(i)) + ".display").String(),
+			Value:           resBody.Get("roles." + strconv.Itoa(int(i)) + ".value").String(),
+		})
+	}
 
-	c.IndentedJSON(http.StatusOK, res)
+	// TODO: utilize role-based authorization made available from utils package
+	// get a boolean return value and send it out
+	c.IndentedJSON(http.StatusOK, roles)
 }
