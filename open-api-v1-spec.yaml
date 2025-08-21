@@ -45,7 +45,7 @@ paths:
       tags: [authorization]
       summary: Authorize user for door access
       description: >
-        Receives biometric data (e.g., facial recognition) from HikCentral, queries WSO2 Identity Server for user roles,
+        Receives results of processing biometric data (e.g., facial recognition) from HikCentral, queries WSO2 IDP for user roles,
         and determines if the user is authorized to access a specific door.
       requestBody:
         required: true
