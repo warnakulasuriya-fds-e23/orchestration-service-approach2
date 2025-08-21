@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/routes"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
 )
 
 func main() {
@@ -20,6 +21,11 @@ func main() {
 			log.Println(".env successfully loaded")
 		}
 	}
+	accessRequirements, err := utils.ReadAccessRequirementsFile()
+	if err != nil {
+		log.Println("failed to read access requirements file:", err)
+	}
+	log.Println(accessRequirements)
 	// Initialize Gin router
 	router := gin.Default()
 

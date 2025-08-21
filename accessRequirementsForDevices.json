@@ -1,13 +1,13 @@
 {
 	"requirements": {
 		"device1": {
-			"requiredRole": "accesslevel1"
+			"requiredRole": "AccessLevel1"
 		},
 		"device2": {
-			"requiredRole": "accesslevel2"
+			"requiredRole": "AccessLevel2"
 		},
 		"ladfklafd1434": {
-			"requiredRole": "accesslevel3"
+			"requiredRole": "AccessLevel1"
 		}
 	}
 }

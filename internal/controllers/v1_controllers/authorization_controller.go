@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/models"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
 )
 
 type AuthorizationController struct{}
@@ -80,7 +81,18 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 		})
 	}
 
-	// TODO: utilize role-based authorization made available from utils package
-	// get a boolean return value and send it out
-	c.IndentedJSON(http.StatusOK, roles)
+	var roleNames []string
+	for _, role := range roles {
+		roleNames = append(roleNames, role.GetRoleName())
+	}
+	accessGranted, err := utils.RoleBasedAuthorization(deviceId, roleNames)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to authorize user for device access"})
+		return
+	}
+	if !accessGranted {
+		c.JSON(403, gin.H{"error": "User is not authorized to access this device"})
+		return
+	}
+	c.JSON(200, gin.H{"message": "User is authorized to access this device"})
 }

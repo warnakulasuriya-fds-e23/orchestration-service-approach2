@@ -9,3 +9,7 @@ type WSO2IDPRoleObject struct {
 	Display         string `json:"display"`
 	Value           string `json:"value"`
 }
+
+func (role *WSO2IDPRoleObject) GetRoleName() string {
+	return role.Display
+}
