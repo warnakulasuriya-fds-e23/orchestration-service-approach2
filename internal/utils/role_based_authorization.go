@@ -6,9 +6,14 @@ import (
 
 func RoleBasedAuthorization(deviceId string, userRoles []string) (bool, error) {
 	access_granted := false
-	accessRequirements, err := ReadAccessRequirementsFile()
-	if err != nil {
-		err = fmt.Errorf("failed to read access requirements file: %w", err)
+	requirementsManager := GetRequirementsManager()
+	accessRequirements := requirementsManager.GetAccessRequirements()
+	if !requirementsManager.IsInitialized {
+		err := fmt.Errorf("requirementsManager is not initialized")
+		return access_granted, err
+	}
+	if accessRequirements.Requirements == nil {
+		err := fmt.Errorf("no access requirements found, please check the file pointed to in environmental variable ACCESS_REQUIREMENTS_FILE")
 		return access_granted, err
 	}
 	DeviceData, ok := accessRequirements.Requirements[deviceId]

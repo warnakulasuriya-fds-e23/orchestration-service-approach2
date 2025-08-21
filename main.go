@@ -21,11 +21,13 @@ func main() {
 			log.Println(".env successfully loaded")
 		}
 	}
-	accessRequirements, err := utils.ReadAccessRequirementsFile()
-	if err != nil {
-		log.Println("failed to read access requirements file:", err)
+	// Initialize requirements manager
+	requirementsManager := utils.GetRequirementsManager()
+	if !requirementsManager.IsInitialized {
+		log.Println("failed to initialize requirements manager")
+		return
 	}
-	log.Println(accessRequirements)
+
 	// Initialize Gin router
 	router := gin.Default()
 
