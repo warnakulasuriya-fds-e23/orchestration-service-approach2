@@ -1,0 +1,166 @@
+openapi: 3.1.0
+info:
+  title: Orchestration Service API
+  version: v1
+  description: >
+    REST API for role-based authorization and access requirements management for biometric security devices.
+    Integrates with HikCentral and WSO2 Identity Server for facial recognition and access control.
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+tags:
+  - name: common
+    description: Common endpoints such as health checks.
+  - name: requirements
+    description: Endpoints for managing and retrieving access requirements and device data.
+  - name: authorization
+    description: Endpoints for role-based authorization based on biometric processing results.
+
+paths:
+  /health:
+    get:
+      tags: [common]
+      summary: Health check
+      description: Returns the health status of the orchestration service.
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  message:
+                    type: string
+                    example: Service is running
+
+
+  /api/v1/authorization/authorize-for-door-access:
+    post:
+      tags: [authorization]
+      summary: Authorize user for door access
+      description: >
+        Receives biometric data (e.g., facial recognition) from HikCentral, queries WSO2 Identity Server for user roles,
+        and determines if the user is authorized to access a specific door.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomingDataFromHikCentral'
+      responses:
+        '200':
+          description: Authorization result and user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationResponse'
+        '400':
+          description: Invalid request body
+        '500':
+          description: Internal server error
+
+  /api/v1/requirements/reload-requirements-file:
+    get:
+      tags: [requirements]
+      summary: Reload access requirements file
+      description: Reloads the access requirements file from disk and updates the in-memory configuration.
+      responses:
+        '200':
+          description: Successfully reloaded access requirements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully reloaded access requirements
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Failed to reload access requirements file
+
+  /api/v1/requirements/configured-requirements-file-path:
+    get:
+      tags: [requirements]
+      summary: Get configured requirements file path
+      description: Returns the file path of the currently configured access requirements file.
+      responses:
+        '200':
+          description: Configured requirements file path
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  configured_requirements_file_path:
+                    type: string
+                    example: /path/to/accessRequirementsForDevices.json
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Failed to get configured requirements file path
+
+components:
+  schemas:
+    IncomingDataFromHikCentral:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: skf2425
+          description: Unique user identifier from HikCentral
+        name:
+          type: string
+          example: John Doe
+          description: Name of the recognized user
+        description:
+          type: string
+          example: Part of the ops department
+          description: Description of the biometric event
+        device_id:
+          type: string
+          example: sfhsfig324r
+          description: Unique identifier for the device
+      required:
+        - user_id
+        - device_id
+
+    AuthorizationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User is authorized to access this device
+          description: short message describing whether the user is authorized
+
+    AccessRequirementsObject:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          example: sfhsfig324r
+          description: Unique identifier for the security device
+        requiredRole:
+          type: string
+          example: AccessLevel1
+          description: Role required for access
+
