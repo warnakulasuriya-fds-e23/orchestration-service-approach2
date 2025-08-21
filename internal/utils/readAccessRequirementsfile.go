@@ -12,7 +12,7 @@ import (
 //TODO: Read accessRequirementsForDevices.json and get the data loaded in to an
 //access requirements object
 
-func ReadAccessRequirementsFile() (models.AccessRequirements, error) {
+func ReadAccessRequirementsFile(requirementFilePath string) (models.AccessRequirements, error) {
 	var accessRequirements models.AccessRequirements
 	reqFile := os.Getenv("ACCESS_REQUIREMENTS_FOR_DEVICES_File")
 	reqFilePath, err := filepath.Abs(reqFile)

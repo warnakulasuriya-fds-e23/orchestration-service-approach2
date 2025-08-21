@@ -14,6 +14,7 @@ func SetupRoutes(router *gin.Engine) {
 	v1 := router.Group("/api/v1") // Create a base group for API v1
 	{
 		// Setup authorization routes
-		v1_routes.SetupAuthorizationRoutes(v1)
+		v1_routes.SetupAuthorizationRoutes(v1.Group("/authorization"))
+		v1_routes.SetupRequirementsRoutes(v1.Group("/requirements"))
 	}
 }
