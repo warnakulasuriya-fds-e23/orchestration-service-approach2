@@ -10,6 +10,7 @@ import (
 func SetupRoutes(router *gin.Engine) {
 	// Setup health routes
 	common_routes.SetupHealthRoutes(router)
+	common_routes.SetupLoggerRoutes(router)
 
 	v1 := router.Group("/api/v1") // Create a base group for API v1
 	{

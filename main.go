@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"log"
 	"os"
 
@@ -9,6 +11,20 @@ import (
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/routes"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
 )
+
+func RequestLoggerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var buf bytes.Buffer
+		tee := io.TeeReader(c.Request.Body, &buf)
+		body, _ := io.ReadAll(tee)
+		c.Request.Body = io.NopCloser(&buf)
+		log.Println("Request middleware log start")
+		log.Println(string(body))
+		log.Println(c.Request.Header)
+		log.Println("Request middleware log end")
+		c.Next()
+	}
+}
 
 func main() {
 	_, err := os.Stat(".env")
@@ -34,10 +50,11 @@ func main() {
 	// Add middleware for logging and recovery
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(RequestLoggerMiddleware())
 
 	// Setup all routes
 	routes.SetupRoutes(router)
 
 	// Start server on port 8080
-	router.Run(":5000")
+	router.Run(":9090")
 }
