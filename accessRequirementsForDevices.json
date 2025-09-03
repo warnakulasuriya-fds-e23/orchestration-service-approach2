@@ -8,6 +8,9 @@
 		},
 		"ladfklafd1434": {
 			"requiredRole": "AccessLevel1"
+		},
+		"3b440000-4020-11b5-83fd-2448454da1d4": {
+			"requiredRole": "AccessLevel1"
 		}
 	}
 }

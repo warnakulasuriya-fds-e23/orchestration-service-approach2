@@ -1,12 +1,16 @@
 package streamlisteners
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"mime" // Correct package for ParseMediaType
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -110,19 +114,53 @@ func listenForAlerts(endpoint string) error {
 					log.Println("The name value of identified employee ", name)
 					log.Println("The device ID of identified employee ", deviceId)
 					// extracting userid pres
-					// nameData := strings.Fields(name)
-					// var userId string
-					// if len(nameData) == 2 {
-					// 	userId = nameData[1]
-					// } else if len(nameData) == 1 {
-					// 	userId = nameData[0]
-					// } else {
-					// 	log.Println("Received an 'alarmResult' event with an unexpected name format. Dropping.")
-					// } // TODO: Initialize http client at outgoingFingerprintController Startup
-					// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-					// internalclient := &http.Client{Transport: tr}
-					// httpReq, err := http.NewRequest("POST", "http://localhost:", userId), nil)
+					nameData := strings.Fields(name)
+					var userId string
+					if len(nameData) == 2 {
+						userId = nameData[1]
+					} else if len(nameData) == 1 {
+						userId = nameData[0]
+					} else {
+						log.Println("Received an 'alarmResult' event with an unexpected name format. Dropping.")
+					} // TODO: Initialize http client at outgoingFingerprintController Startup
+					dataToSend := map[string]string{
+						"user_id":   userId,
+						"device_id": deviceId,
+					}
+					submissionObj, err := json.Marshal(dataToSend)
+					if err != nil {
+						log.Printf("Error marshalling submission object: %v", err)
+						continue
+					}
+					submissionBytesArray := bytes.NewBuffer(submissionObj)
 
+					tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+					internalclient := &http.Client{Transport: tr}
+					submissionUrl, err := url.JoinPath("http://localhost:"+os.Getenv("PORT"), "/api/v1/authorization/authorize-for-door-access")
+					if err != nil {
+						log.Printf("Error creating submission URL: %v", err)
+						continue
+					}
+					httpReq, err := http.NewRequest("POST", submissionUrl, submissionBytesArray)
+					if err != nil {
+						log.Printf("Error creating HTTP request: %v", err)
+						continue
+					}
+
+					httpReq.Header.Set("Content-Type", "application/json")
+					resp, err := internalclient.Do(httpReq)
+					if err != nil {
+						log.Printf("Error sending HTTP request: %v", err)
+						continue
+					}
+					defer resp.Body.Close()
+
+					if resp.StatusCode != http.StatusOK {
+						log.Printf("Unexpected status code from internal API: %d", resp.StatusCode)
+						log.Printf("Response body: %v", resp.Body)
+					} else {
+						log.Printf("Successfully processed 'alarmResult' event. Response: %s", resp.Status)
+					}
 				} else {
 					// The error message is not "ok"
 					log.Printf("Received an 'alarmResult' event with a non-ok message: '%s'. Dropping.", errorMessage)

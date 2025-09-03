@@ -57,6 +57,6 @@ func main() {
 	// Setup all routes
 	routes.SetupRoutes(router)
 
-	// Start server on port 9090
-	router.Run(":9090")
+	// Start server on port specified in environment variables
+	router.Run(":" + os.Getenv("PORT"))
 }
