@@ -117,7 +117,7 @@ func listenForAlerts(endpoint string) error {
 					nameData := strings.Fields(name)
 					var userId string
 					if len(nameData) == 2 {
-						userId = nameData[1]
+						userId = nameData[0] + nameData[1]
 					} else if len(nameData) == 1 {
 						userId = nameData[0]
 					} else {
