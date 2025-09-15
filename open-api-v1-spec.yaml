@@ -17,6 +17,8 @@ tags:
     description: Endpoints for managing and retrieving access requirements and device data.
   - name: authorization
     description: Endpoints for role-based authorization based on biometric processing results.
+  - name: event-receive
+    description: Endpoints for receiving biometric event data from HikCentral.
 
 paths:
   /health:
@@ -118,7 +120,34 @@ paths:
                   error:
                     type: string
                     example: Failed to get configured requirements file path
-
+  /api/v1/event-receive/receive-face-match-event:
+    post:
+      tags: [event-receive]
+      summary: Receive face match event from HikCentral
+      description: >
+        Endpoint to receive biometric event data (e.g., face match results) from HikCentral.
+        This data will be processed to determine user identity and access authorization.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaceMatchEventNotificationObject'
+      responses:
+        '200':
+          description: Event received and processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Event received and processed successfully
+        '400':
+          description: Invalid request body
+        '500':
+          description: Internal server error
 components:
   schemas:
     IncomingDataFromHikCentral:
@@ -163,4 +192,144 @@ components:
           type: string
           example: AccessLevel1
           description: Role required for access
+    FaceMatchEventNotificationObject:
+      type: object
+      properties:
+        method:
+          type: string
+          example: OnEventNotify
+        params:
+          type: object
+          properties:
+            sendTime:
+              type: string
+              format: date-time
+              example: 2025-09-15T13:34:12+05:00
+            ability:
+              type: string
+              example: event_face_match
+            events:
+              type: array
+              items:
+                type: object
+                properties:
+                  eventId:
+                    type: string
+                    example: C219A520D0BD4214AD894EBACA9C32ED
+                  srcIndex:
+                    type: string
+                    example: "2"
+                  srcType:
+                    type: string
+                    example: camera
+                  srcName:
+                    type: string
+                    example: 11th-MainLift
+                  eventType:
+                    type: integer
+                    example: 131659
+                  status:
+                    type: integer
+                    example: 0
+                  happenTime:
+                    type: string
+                    format: date-time
+                    example: 2025-09-15T13:34:12+05:30
+                  data:
+                    type: object
+                    properties:
+                      dataType:
+                        type: string
+                        example: faceMatch
+                      alarmResult:
+                        type: object
+                        properties:
+                          faces:
+                            type: object
+                            properties:
+                              identify:
+                                type: object
+                                properties:
+                                  candidate:
+                                    type: object
+                                    properties:
+                                      human_id:
+                                        type: string
+                                        example: "8"
+                                      blacklist_id:
+                                        type: string
+                                        example: "3"
+                                      human_data:
+                                        type: object
+                                        properties:
+                                          face_pic_url:
+                                            type: string
+                                            example: 0f61ba76b1a6ace23169223c9e30a55ab0308afba90a6a24b48746007437d714e
+                                      reserve_field:
+                                        type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                            example: Dheera Warnakulasuriya
+                                      similarity:
+                                        type: integer
+                                        example: 95
+                                  URL:
+                                    type: string
+                                    example: Vsm://PHQG#20250915#20250915_105814149.d:252760086:450624
+                                  faceRect:
+                                    type: object
+                                    properties:
+                                      height:
+                                        type: number
+                                        example: 0.5740000009536743
+                                      width:
+                                        type: number
+                                        example: 0.19300000369548798
+                                      x:
+                                        type: number
+                                        example: 0.44999998807907107
+                                      y:
+                                        type: number
+                                        example: 0.296999990940094
+                                  age:
+                                    type: object
+                                    properties:
+                                      ageGroup:
+                                        type: integer
+                                        example: 0
+                                  gender:
+                                    type: object
+                                    properties:
+                                      value:
+                                        type: integer
+                                        example: 0
+                                  temperature:
+                                    type: object
+                                    properties:
+                                      temperatureData:
+                                        type: number
+                                        example: 0.0
+                                      temperatureStatus:
+                                        type: integer
+                                        example: -1
+                                  mask:
+                                    type: object
+                                    properties:
+                                      wearMaskStatus:
+                                        type: integer
+                                        example: 0
+                          targetAttrs:
+                            type: object
+                            properties:
+                              cameraIndexCode:
+                                type: string
+                                example: "2"
+                              faceTime:
+                                type: string
+                                format: date-time
+                                example: 2025-09-15T13:34:12+05:30
+        isHistory:
+          type: integer
+          example: 0
 

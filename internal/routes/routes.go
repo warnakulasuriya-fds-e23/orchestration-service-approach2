@@ -17,5 +17,6 @@ func SetupRoutes(router *gin.Engine) {
 		// Setup authorization routes
 		v1_routes.SetupAuthorizationRoutes(v1.Group("/authorization"))
 		v1_routes.SetupRequirementsRoutes(v1.Group("/requirements"))
+		v1_routes.SetupEventReceiveRoutes(v1.Group("/event-receive"))
 	}
 }

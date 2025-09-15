@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/routes"
-	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/streamlisteners"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
 )
 
@@ -45,7 +44,7 @@ func main() {
 		return
 	}
 
-	streamlisteners.StartAlertStreamListener(os.Getenv("ALERT_STREAM_ENDPOINT"))
+	// streamlisteners.StartAlertStreamListener(os.Getenv("ALERT_STREAM_ENDPOINT"))
 	// Initialize Gin router
 	router := gin.Default()
 
