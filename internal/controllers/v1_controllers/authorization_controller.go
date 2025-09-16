@@ -94,6 +94,16 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 		c.JSON(403, gin.H{"error": "User is not authorized to access this device"})
 		return
 	}
-	utils.UnlockDoor(deviceId)
+	requirementManager := utils.GetRequirementsManager()
+	doorId, err := requirementManager.GetDoorId(deviceId)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	unlocked, err := utils.UnlockDoor(doorId)
+	if err != nil || !unlocked {
+		c.JSON(500, gin.H{"error": "Failed to unlock the door"})
+		return
+	}
 	c.JSON(200, gin.H{"message": "User is authorized to access this device"})
 }

@@ -7,6 +7,7 @@ type AccessRequirements struct {
 }
 
 type DeviceData struct {
+	DoorId       string `json:"doorId"`
 	RequiredRole string `json:"requiredRole"`
 }
 
@@ -14,4 +15,8 @@ type DeviceData struct {
 func (ar *AccessRequirements) GetRequiredRole(deviceId string) (role string, err error) {
 	deviceData := ar.Requirements[deviceId]
 	return deviceData.RequiredRole, nil
+}
+func (ar *AccessRequirements) GetDoorId(deviceId string) (doorId string, err error) {
+	deviceData := ar.Requirements[deviceId]
+	return deviceData.DoorId, nil
 }

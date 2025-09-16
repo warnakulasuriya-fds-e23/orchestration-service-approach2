@@ -80,3 +80,16 @@ func (rm *RequirementsManager) GetRequiredRoleOfDevice(deviceId string) (string,
 	}
 	return deviceData.RequiredRole, nil
 }
+
+func (rm *RequirementsManager) GetDoorId(deviceId string) (string, error) {
+	if !rm.IsInitialized {
+		log.Println("Requirements manager is not initialized")
+		return "", fmt.Errorf("requirements manager is not initialized")
+	}
+	deviceData, ok := rm.AccessRequirements.Requirements[deviceId]
+	if !ok {
+		log.Printf("Device ID %s not found in access requirements", deviceId)
+		return "", fmt.Errorf("device ID %s not found in access requirements", deviceId)
+	}
+	return deviceData.DoorId, nil
+}

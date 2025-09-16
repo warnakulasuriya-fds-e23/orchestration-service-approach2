@@ -1,18 +1,23 @@
 {
 	"requirements": {
 		"device1": {
+			"doorId": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
 			"requiredRole": "AccessLevel1"
 		},
 		"device2": {
+			"doorId": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
 			"requiredRole": "AccessLevel2"
 		},
 		"ladfklafd1434": {
+			"doorId": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
 			"requiredRole": "AccessLevel1"
 		},
 		"3b440000-4020-11b5-83fd-2448454da1d4": {
+			"doorId": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
 			"requiredRole": "AccessLevel1"
 		},
 		"11th-MainLift": {
+			"doorId": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
 			"requiredRole": "AccessLevel1"
 		}
 	}
