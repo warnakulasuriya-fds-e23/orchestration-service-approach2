@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
@@ -82,7 +83,24 @@ func (erc *EventReceiveController) ReceiveFaceMatchEvent(c *gin.Context) {
 		}
 
 		gjsonSecondResult := gjson.ParseBytes(bodyBytes)
-		userId := gjsonSecondResult.Get("data.remark").String()
+		numberOfCustomFields := gjsonSecondResult.Get("data.customFieldList.#").Int()
+		if numberOfCustomFields == 0 {
+			c.JSON(500, gin.H{"error": "no custom fields found in HCP person info response"})
+			log.Println("no custom fields found in HCP person info response")
+			return
+		}
+		var userId string
+		for i := int64(0); i < numberOfCustomFields; i++ {
+			if gjsonSecondResult.Get("data.customFieldList."+strconv.Itoa(int(i))+".customFieldName").String() == "userId" {
+				userId = gjsonSecondResult.Get("data.customFieldList." + strconv.Itoa(int(i)) + ".customFieldValue").String()
+				break
+			}
+		}
+		if userId == "" {
+			c.JSON(500, gin.H{"error": "userId custom field not found in HCP person info response"})
+			log.Println("userId custom field not found in HCP person info response")
+			return
+		}
 		deviceId := gjsonResult.Get("params.events.0.srcName").String()
 		go func() {
 			dataToSend := map[string]string{
