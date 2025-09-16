@@ -37,6 +37,7 @@ func main() {
 			log.Println(".env successfully loaded")
 		}
 	}
+	utils.CheckEnvs()
 	// Initialize requirements manager
 	requirementsManager := utils.GetRequirementsManager()
 	if !requirementsManager.IsInitialized {
