@@ -34,7 +34,7 @@ func (erc *EventReceiveController) ReceiveFaceMatchEvent(c *gin.Context) {
 		gjsonResult.Get("params.events.0.data.alarmResult.faces.identify.candidate.human_id").String() != "-1" {
 		log.Println("Received a valid FaceMatch event with a recognized human_id.")
 
-		HcpAddress := os.Getenv("HCP_ADDRESS")
+		HcpAddress := os.Getenv("HCP_IP_ADDRESS")
 		HcpPersonInfoUrl, err := url.JoinPath("https://", HcpAddress, "/artemis/api/resource/v1/person/personId/personInfo")
 		if err != nil {
 			c.JSON(500, gin.H{"error while creating HCP person info URL": err.Error()})

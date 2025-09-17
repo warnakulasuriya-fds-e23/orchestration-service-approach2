@@ -113,7 +113,7 @@ orchestration-service-approach2/
 
 Create a `.env` file in the project root:
 ```
-IDP_ADDRESS=https://localhost:9443
+IDP_BASE_URL=https://localhost:9443
 IDP_USERNAME=admin
 IDP_PASSWORD=admin
 ```

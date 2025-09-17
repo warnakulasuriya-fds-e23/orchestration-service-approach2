@@ -6,8 +6,8 @@ import (
 )
 
 func CheckEnvs() {
-	if os.Getenv("IDP_ADDRESS") == "" {
-		log.Fatal("IDP_ADDRESS environment variable not set")
+	if os.Getenv("IDP_BASE_URL") == "" {
+		log.Fatal("IDP_BASE_URL environment variable not set")
 	}
 	if os.Getenv("IDP_USERNAME") == "" {
 		log.Fatal("IDP_USERNAME environment variable not set")
@@ -24,8 +24,8 @@ func CheckEnvs() {
 	if os.Getenv("HCP_OPENAPI_USER_SECRET") == "" {
 		log.Fatal("HCP_OPENAPI_USER_SECRET environment variable not set")
 	}
-	if os.Getenv("HCP_ADDRESS") == "" {
-		log.Fatal("HCP_ADDRESS environment variable not set")
+	if os.Getenv("HCP_IP_ADDRESS") == "" {
+		log.Fatal("HCP_IP_ADDRESS environment variable not set")
 	}
 	if os.Getenv("ACCESS_CONTROL_CONFIG_INTERVAL") == "" {
 		log.Fatal("ACCESS_CONTROL_CONFIG_INTERVAL environment variable not set")
