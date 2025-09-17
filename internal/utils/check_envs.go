@@ -9,12 +9,6 @@ func CheckEnvs() {
 	if os.Getenv("IDP_BASE_URL") == "" {
 		log.Fatal("IDP_BASE_URL environment variable not set")
 	}
-	if os.Getenv("IDP_USERNAME") == "" {
-		log.Fatal("IDP_USERNAME environment variable not set")
-	}
-	if os.Getenv("IDP_PASSWORD") == "" {
-		log.Fatal("IDP_PASSWORD environment variable not set")
-	}
 	if os.Getenv("IDP_CLIENT_ID") == "" {
 		log.Fatal("IDP_CLIENT_ID environment variable not set")
 	}
