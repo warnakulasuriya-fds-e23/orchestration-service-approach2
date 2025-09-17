@@ -13,12 +13,20 @@ func UnlockDoor(doorId string) (bool, error) {
 	interval := os.Getenv("ACCESS_CONTROL_CONFIG_INTERVAL")
 	apiKey := os.Getenv("ACCESS_CONTROL_CONFIG_API_KEY")
 	doorAPIBaseURL := os.Getenv("ACCESS_CONTROL_CONFIG_BASE_URL")
-	completeURL, err := url.JoinPath(doorAPIBaseURL, "/api/door/remoteOpenById?doorId=", doorId,
-		"&interval=", interval, "&access_token=", apiKey)
+	// Construct the URL parts
+	completeURL, err := url.Parse(doorAPIBaseURL)
 	if err != nil {
 		return false, err
 	}
-	httpReq, err := http.NewRequest("POST", completeURL, nil)
+	completeURL.Path = "/api/door/remoteOpenById"
+
+	// Add the query parameters to the URL
+	params := url.Values{}
+	params.Add("doorId", doorId)
+	params.Add("interval", interval)
+	params.Add("access_token", apiKey)
+	completeURL.RawQuery = params.Encode()
+	httpReq, err := http.NewRequest("POST", completeURL.String(), nil)
 	if err != nil {
 		return false, err
 	}

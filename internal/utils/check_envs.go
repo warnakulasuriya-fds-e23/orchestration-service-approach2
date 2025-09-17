@@ -15,6 +15,12 @@ func CheckEnvs() {
 	if os.Getenv("IDP_PASSWORD") == "" {
 		log.Fatal("IDP_PASSWORD environment variable not set")
 	}
+	if os.Getenv("IDP_CLIENT_ID") == "" {
+		log.Fatal("IDP_CLIENT_ID environment variable not set")
+	}
+	if os.Getenv("IDP_CLIENT_SECRET") == "" {
+		log.Fatal("IDP_CLIENT_SECRET environment variable not set")
+	}
 	if os.Getenv("ACCESS_REQUIREMENTS_FOR_DEVICES_File") == "" {
 		log.Fatal("ACCESS_REQUIREMENTS_FOR_DEVICES_File environment variable not set")
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/routes"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/tokenstorage"
 )
 
 func RequestLoggerMiddleware() gin.HandlerFunc {
@@ -38,6 +39,11 @@ func main() {
 		}
 	}
 	utils.CheckEnvs()
+	_, err = tokenstorage.GetTokenStorage().GetAccessToken()
+	if err != nil {
+		log.Fatalf("failed to initialize token storage: %v", err)
+		return
+	}
 	// Initialize requirements manager
 	requirementsManager := utils.GetRequirementsManager()
 	if !requirementsManager.IsInitialized {

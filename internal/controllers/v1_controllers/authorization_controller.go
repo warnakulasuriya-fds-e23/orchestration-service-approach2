@@ -13,6 +13,7 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/models"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/tokenstorage"
 )
 
 type AuthorizationController struct{}
@@ -47,7 +48,14 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 		c.JSON(500, gin.H{"error while creating new request": err.Error()})
 		return
 	}
-	newRequest.SetBasicAuth(os.Getenv("IDP_USERNAME"), os.Getenv("IDP_PASSWORD"))
+	newRequest.Header.Set("Accept", "application/scim+json")
+	token, err := tokenstorage.GetTokenStorage().GetAccessToken()
+	if err != nil {
+		c.JSON(500, gin.H{"error while getting access token": err.Error()})
+		return
+	}
+	newRequest.Header.Set("Authorization", "Bearer "+token)
+
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	internalclient := &http.Client{Transport: tr}
 	resp, err := internalclient.Do(newRequest)
@@ -58,7 +66,13 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		c.JSON(resp.StatusCode, gin.H{"error": "Failed to authorize user"})
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to authorize user", "details": resp.Status, "idpresponse": resp.Body})
+		resBodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(500, gin.H{"error while reading response body": err.Error()})
+			return
+		}
+		log.Println("Response from IDP:", string(resBodyBytes))
 		return
 	}
 	resBodyBytes, err := io.ReadAll(resp.Body)
