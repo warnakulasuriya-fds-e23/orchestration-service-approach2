@@ -13,6 +13,7 @@ import (
 //access requirements object
 
 func ReadAccessRequirementsFile(requirementFilePath string) (models.AccessRequirements, error) {
+	var accessRequirementsFileStruct models.AccessRequirementsFileStruct
 	var accessRequirements models.AccessRequirements
 	reqFile := os.Getenv("ACCESS_REQUIREMENTS_FOR_DEVICES_File")
 	reqFilePath, err := filepath.Abs(reqFile)
@@ -27,9 +28,18 @@ func ReadAccessRequirementsFile(requirementFilePath string) (models.AccessRequir
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&accessRequirements)
+	err = decoder.Decode(&accessRequirementsFileStruct)
 	if err != nil {
 		return accessRequirements, err
+	}
+
+	// Map the requirements from the file struct to the access requirements struct
+	accessRequirements.Requirements = make(map[string]models.DeviceData)
+	for _, requirement := range accessRequirementsFileStruct.Requirements {
+		accessRequirements.Requirements[requirement.HCPDefinedCameraName] = models.DeviceData{
+			DoorId:       requirement.DoorId,
+			RequiredRole: requirement.RequiredRole,
+		}
 	}
 
 	return accessRequirements, nil
