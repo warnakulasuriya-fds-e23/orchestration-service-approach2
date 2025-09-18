@@ -6,12 +6,6 @@ import (
 )
 
 func CheckEnvs() {
-	if os.Getenv("ENABLE_INTERNAL_SUBSCRIPTION_TO_FACE_MATCH_EVENT") == "" {
-		log.Fatal("ENABLE_INTERNAL_SUBSCRIPTION_TO_FACE_MATCH_EVENT environment variable not set")
-	}
-	if os.Getenv("ENABLE_INTERNAL_SUBSCRIPTION_TO_FACE_MATCH_EVENT") == "true" && os.Getenv("ORCHESTRATION_SERVICE_BASE_URL") == "" {
-		log.Fatal("ORCHESTRATION_SERVICE_BASE_URL environment variable not set")
-	}
 	if os.Getenv("IDP_BASE_URL") == "" {
 		log.Fatal("IDP_BASE_URL environment variable not set")
 	}
