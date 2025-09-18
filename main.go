@@ -39,6 +39,10 @@ func main() {
 		}
 	}
 	utils.CheckEnvs()
+	if os.Getenv("ENABLE_INTERNAL_SUBSCRIPTION_TO_FACE_MATCH_EVENT") == "true" {
+		log.Println("Subscribing to face match event has been enabled, attempting subscription")
+		utils.SubscribeToFaceMatchEvent()
+	}
 	_, err = tokenstorage.GetTokenStorage().GetAccessToken()
 	if err != nil {
 		log.Fatalf("failed to initialize token storage: %v", err)
