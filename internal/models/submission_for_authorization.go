@@ -1,20 +1,20 @@
 package models
 
-type IncomingDataFromHikCentral struct {
+type SubmissionForAuthorization struct {
 	UserID      string `json:"user_id"`
 	UserName    string `json:"user_name"`
 	Description string `json:"description"`
 	DeviceID    string `json:"device_id"`
 }
 
-func (data *IncomingDataFromHikCentral) GetUserId() (string, error) {
+func (data *SubmissionForAuthorization) GetUserId() (string, error) {
 	return data.UserID, nil
 }
 
-func (data *IncomingDataFromHikCentral) GetDeviceId() (string, error) {
+func (data *SubmissionForAuthorization) GetDeviceId() (string, error) {
 	return data.DeviceID, nil
 }
 
-func (data *IncomingDataFromHikCentral) GetUserName() (string, error) {
+func (data *SubmissionForAuthorization) GetUserName() (string, error) {
 	return data.UserName, nil
 }

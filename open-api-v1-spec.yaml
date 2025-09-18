@@ -54,7 +54,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IncomingDataFromHikCentral'
+              $ref: '#/components/schemas/SubmissionForAuthorization'
       responses:
         '200':
           description: Authorization result and user details
@@ -150,7 +150,7 @@ paths:
           description: Internal server error
 components:
   schemas:
-    IncomingDataFromHikCentral:
+    SubmissionForAuthorization:
       type: object
       properties:
         user_id:
