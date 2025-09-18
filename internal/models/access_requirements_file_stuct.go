@@ -5,7 +5,7 @@ type AccessRequirementsFileStruct struct {
 }
 
 type Requirement struct {
-	HCPDefinedCameraName string `json:"hcp_defined_camera_name"`
-	DoorId               string `json:"door_id"`
-	RequiredRole         string `json:"required_role"`
+	BiometricDeviceId string `json:"biometric_device_id"`
+	DoorId            string `json:"door_id"`
+	RequiredRole      string `json:"required_role"`
 }

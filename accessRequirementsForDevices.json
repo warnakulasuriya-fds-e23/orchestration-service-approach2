@@ -1,27 +1,27 @@
 {
   "requirements": [
     {
-      "hcp_defined_camera_name": "device1",
+      "biometric_device_id": "device1",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
       "required_role": "AccessLevel1"
     },
     {
-      "hcp_defined_camera_name": "device2",
+      "biometric_device_id": "device2",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
       "required_role": "AccessLevel2"
     },
     {
-      "hcp_defined_camera_name": "ladfklafd1434",
+      "biometric_device_id": "ladfklafd1434",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
       "required_role": "AccessLevel1"
     },
     {
-      "hcp_defined_camera_name": "3b440000-4020-11b5-83fd-2448454da1d4",
+      "biometric_device_id": "3b440000-4020-11b5-83fd-2448454da1d4",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
       "required_role": "AccessLevel1"
     },
     {
-      "hcp_defined_camera_name": "11th-MainLift",
+      "biometric_device_id": "11th-MainLift",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
       "required_role": "AccessLevel1"
     }
