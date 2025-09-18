@@ -18,15 +18,6 @@ func CheckEnvs() {
 	if os.Getenv("ACCESS_REQUIREMENTS_FOR_DEVICES_File") == "" {
 		log.Fatal("ACCESS_REQUIREMENTS_FOR_DEVICES_File environment variable not set")
 	}
-	if os.Getenv("HCP_OPENAPI_USER_KEY") == "" {
-		log.Fatal("HCP_OPENAPI_USER_KEY environment variable not set")
-	}
-	if os.Getenv("HCP_OPENAPI_USER_SECRET") == "" {
-		log.Fatal("HCP_OPENAPI_USER_SECRET environment variable not set")
-	}
-	if os.Getenv("HCP_IP_ADDRESS") == "" {
-		log.Fatal("HCP_IP_ADDRESS environment variable not set")
-	}
 	if os.Getenv("ACCESS_CONTROL_CONFIG_INTERVAL") == "" {
 		log.Fatal("ACCESS_CONTROL_CONFIG_INTERVAL environment variable not set")
 	}

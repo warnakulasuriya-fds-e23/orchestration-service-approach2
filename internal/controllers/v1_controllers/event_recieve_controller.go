@@ -9,12 +9,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
-	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/models"
-	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
 )
 
 type EventReceiveController struct{}
@@ -33,78 +30,12 @@ func (erc *EventReceiveController) ReceiveFaceMatchEvent(c *gin.Context) {
 		gjsonResult.Get("params.events.0.eventType").String() == "131659" &&
 		gjsonResult.Get("params.events.0.data.alarmResult.faces.identify.candidate.human_id").String() != "-1" {
 		log.Println("Received a valid FaceMatch event with a recognized human_id.")
+		userName := gjsonResult.Get("params.events.0.data.alarmResult.faces.identify.candidate.reserve_field.name").String()
 
-		HcpAddress := os.Getenv("HCP_IP_ADDRESS")
-		HcpPersonInfoUrl, err := url.JoinPath("https://", HcpAddress, "/artemis/api/resource/v1/person/personId/personInfo")
-		if err != nil {
-			c.JSON(500, gin.H{"error while creating HCP person info URL": err.Error()})
-			return
-		}
-		personalInfoReqObj := models.PersonalInfoRequestObj{
-			PersonId:   gjsonResult.Get("params.events.0.data.alarmResult.faces.identify.candidate.human_id").String(),
-			AppendInfo: []int{6},
-		}
-		jsonReqBody, err := json.Marshal(personalInfoReqObj)
-		if err != nil {
-			c.JSON(500, gin.H{"error while marshalling personal info request object to JSON": err.Error()})
-			return
-		}
-		req, err := http.NewRequest("POST", HcpPersonInfoUrl, bytes.NewBuffer(jsonReqBody))
-		if err != nil {
-			c.JSON(500, gin.H{"error while creating new request to internal authorization endpoint": err.Error()})
-			return
-		}
-		req.Header.Set("Accept", "application/json")
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("X-CA-Key", os.Getenv("HCP_OPENAPI_USER_KEY"))
-		requestURLPath := "/artemis/api/resource/v1/person/personId/personInfo"
-		generatedSignature, err := utils.GenerateSignatureForHcpOpenapi("POST", req.Header, requestURLPath, os.Getenv("HCP_OPENAPI_USER_SECRET"))
-		if err != nil {
-			c.JSON(500, gin.H{"error while generating signature for HCP OpenAPI": err.Error()})
-			return
-		}
-		req.Header.Set("X-CA-Signature", generatedSignature)
-		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-		internalclient := &http.Client{Transport: tr}
-		resp, err := internalclient.Do(req)
-		if err != nil {
-			c.JSON(500, gin.H{"error while sending request to internal authorization endpoint": err.Error()})
-			return
-		}
-		defer resp.Body.Close()
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			c.JSON(500, gin.H{"error while reading response body from internal authorization endpoint": err.Error()})
-			return
-		}
-		if resp.StatusCode != 200 {
-			c.JSON(500, gin.H{"error while getting response from internal authorization endpoint": resp.Status})
-			return
-		}
-
-		gjsonSecondResult := gjson.ParseBytes(bodyBytes)
-		numberOfCustomFields := gjsonSecondResult.Get("data.customFieldList.#").Int()
-		if numberOfCustomFields == 0 {
-			c.JSON(500, gin.H{"error": "no custom fields found in HCP person info response"})
-			log.Println("no custom fields found in HCP person info response")
-			return
-		}
-		var userId string
-		for i := int64(0); i < numberOfCustomFields; i++ {
-			if gjsonSecondResult.Get("data.customFieldList."+strconv.Itoa(int(i))+".customFieldName").String() == "userId" {
-				userId = gjsonSecondResult.Get("data.customFieldList." + strconv.Itoa(int(i)) + ".customFieldValue").String()
-				break
-			}
-		}
-		if userId == "" {
-			c.JSON(500, gin.H{"error": "userId custom field not found in HCP person info response"})
-			log.Println("userId custom field not found in HCP person info response")
-			return
-		}
 		deviceId := gjsonResult.Get("params.events.0.srcName").String()
 		go func() {
 			dataToSend := map[string]string{
-				"user_id":   userId,
+				"user_name": userName,
 				"device_id": deviceId,
 			}
 			submissionObj, err := json.Marshal(dataToSend)

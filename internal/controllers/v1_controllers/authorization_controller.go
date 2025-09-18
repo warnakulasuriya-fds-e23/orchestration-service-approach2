@@ -25,7 +25,7 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 		return
 	}
 
-	userID, err := reqBody.GetUserId()
+	userName, err := reqBody.GetUserName()
 	if err != nil {
 		c.JSON(500, gin.H{"error while getting user ID from request body": err.Error()})
 		return
@@ -38,7 +38,8 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	}
 
 	idpAddress := os.Getenv("IDP_BASE_URL")
-	scimCallUrl, err := url.JoinPath(idpAddress, "/scim2/Users/", userID)
+	scimCallUrl, err := url.JoinPath(idpAddress, "/scim2/Users")
+	scimCallUrl = scimCallUrl + "?filter=userName+Eq+\"" + userName + "\""
 	if err != nil {
 		c.JSON(500, gin.H{"error while joining URL path": err.Error()})
 		return
@@ -82,16 +83,16 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	}
 	log.Println(deviceId)
 	resBody := gjson.ParseBytes(resBodyBytes)
-	lengthOfRoles := resBody.Get("roles.#").Int()
+	lengthOfRoles := resBody.Get("Resources.0.roles.#").Int()
 	var roles []models.WSO2IDPRoleObject
 	for i := int64(0); i < lengthOfRoles; i++ {
 		roles = append(roles, models.WSO2IDPRoleObject{
-			Ref:             resBody.Get("roles." + strconv.Itoa(int(i)) + ".$ref").String(),
-			AudienceDisplay: resBody.Get("roles." + strconv.Itoa(int(i)) + ".audienceDisplay").String(),
-			AudienceType:    resBody.Get("roles." + strconv.Itoa(int(i)) + ".audienceType").String(),
-			AudienceValue:   resBody.Get("roles." + strconv.Itoa(int(i)) + ".audienceValue").String(),
-			Display:         resBody.Get("roles." + strconv.Itoa(int(i)) + ".display").String(),
-			Value:           resBody.Get("roles." + strconv.Itoa(int(i)) + ".value").String(),
+			Ref:             resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".$ref").String(),
+			AudienceDisplay: resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".audienceDisplay").String(),
+			AudienceType:    resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".audienceType").String(),
+			AudienceValue:   resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".audienceValue").String(),
+			Display:         resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".display").String(),
+			Value:           resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".value").String(),
 		})
 	}
 

@@ -57,7 +57,7 @@ func (tokenStorage *TokenStorage) GetAccessToken() (token string, err error) {
 		}
 		data := url.Values{}
 		data.Set("grant_type", "client_credentials")
-		data.Set("scope", "internal_user_mgt_view")
+		data.Set("scope", "internal_user_mgt_view internal_user_mgt_list")
 		requestBody := bytes.NewBufferString(data.Encode())
 		req, errNewReq := http.NewRequest("POST", tokenEndpoint, requestBody)
 		if errNewReq != nil {
