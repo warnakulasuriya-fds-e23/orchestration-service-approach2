@@ -65,8 +65,8 @@ func (tokenStorage *TokenStorage) GetAccessToken() (token string, err error) {
 			err = fmt.Errorf("error while creating a post request for the tokenEndpoint : %w", errNewReq)
 			return
 		}
-		consumerKey := os.Getenv("IDP_CLIENT_ID")
-		consumerSecret := os.Getenv("IDP_CLIENT_SECRET")
+		consumerKey := os.Getenv("CLIENT_ID")
+		consumerSecret := os.Getenv("CLIENT_SECRET")
 		authHeadervalue := base64.StdEncoding.EncodeToString([]byte(consumerKey + ":" + consumerSecret))
 		req.Header.Add("Authorization", "Basic "+authHeadervalue)
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
