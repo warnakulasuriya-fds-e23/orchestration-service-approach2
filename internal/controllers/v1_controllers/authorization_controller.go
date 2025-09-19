@@ -39,7 +39,7 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 
 	idpAddress := os.Getenv("IDP_BASE_URL")
 	scimCallUrl, err := url.JoinPath(idpAddress, "/scim2/Users")
-	scimCallUrl = scimCallUrl + "?filter=userName+Eq+\"" + userName + "\""
+	scimCallUrl = scimCallUrl + "?filter=userName+Co+\"" + userName + "\""
 	if err != nil {
 		c.JSON(500, gin.H{"error while joining URL path": err.Error()})
 		return
