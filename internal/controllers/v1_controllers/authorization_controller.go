@@ -19,6 +19,7 @@ import (
 type AuthorizationController struct{}
 
 func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
+	log.Println("AuthorizeUserForDoorAccess called")
 	var reqBody models.SubmissionForAuthorization
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(400, gin.H{"error cannot bind json to incoming data from hikcentral format": err.Error()})
