@@ -78,6 +78,6 @@ func (erc *EventReceiveController) ReceiveFaceMatchEvent(c *gin.Context) {
 				log.Printf("response body: %v", string(bodyBytes))
 			}
 		}()
-		c.JSON(200, gin.H{"message": "success"})
+		c.JSON(200, gin.H{"message": "successfully received event"})
 	}
 }
