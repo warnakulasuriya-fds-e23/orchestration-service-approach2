@@ -18,7 +18,7 @@ func UnlockDoor(doorId string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	completeURL.Path = "/api/door/remoteOpenById"
+	completeURL.Path += "/api/door/remoteOpenById"
 
 	// Add the query parameters to the URL
 	params := url.Values{}
@@ -30,6 +30,7 @@ func UnlockDoor(doorId string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	httpReq.Header.Set("Api-Key", apiKey)
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	internalclient := &http.Client{Transport: tr}
 	resp, err := internalclient.Do(httpReq)
