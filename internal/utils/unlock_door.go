@@ -3,42 +3,43 @@ package utils
 import (
 	"crypto/tls"
 	"fmt"
-	"log"
+	"io"
+	"net/http"
+	"net/url"
 	"os"
-
-	"github.com/valyala/fasthttp"
 )
 
-// used fasthttp instead of net/http because it wont send the header as api-key but send it as Api-Key which is not accepted by choreo
 func UnlockDoor(doorId string) (bool, error) {
 	interval := os.Getenv("ACCESS_CONTROL_CONFIG_INTERVAL")
 	apiKey := os.Getenv("ACCESS_CONTROL_CONFIG_API_KEY")
 	doorAPIBaseURL := os.Getenv("ACCESS_CONTROL_CONFIG_BASE_URL")
-
-	req := fasthttp.AcquireRequest()
-	defer fasthttp.ReleaseRequest(req)
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseResponse(resp)
-
-	uri := fmt.Sprintf("%s/api/door/remoteOpenById?doorId=%s&interval=%s&access_token=%s",
-		doorAPIBaseURL, doorId, interval, apiKey)
-	req.SetRequestURI(uri)
-	req.Header.SetMethod("POST")
-	req.Header.Set("api-key", apiKey) // lowercase header
-
-	client := &fasthttp.Client{
-		TLSConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	log.Println("UnlockDoor calling URL:", uri)
-	log.Println("Request Headers:", req.Header.String())
-
-	if err := client.Do(req, resp); err != nil {
+	// Construct the URL parts
+	completeURL, err := url.Parse(doorAPIBaseURL)
+	if err != nil {
 		return false, err
 	}
-	if resp.StatusCode() != 200 {
-		log.Println("Response from door endpoint:", string(resp.Body()))
-		return false, fmt.Errorf("unexpected response from door endpoint: %d - %s", resp.StatusCode(), string(resp.Body()))
+	completeURL.Path = "/api/door/remoteOpenById"
+
+	// Add the query parameters to the URL
+	params := url.Values{}
+	params.Add("doorId", doorId)
+	params.Add("interval", interval)
+	params.Add("access_token", apiKey)
+	completeURL.RawQuery = params.Encode()
+	httpReq, err := http.NewRequest("POST", completeURL.String(), nil)
+	if err != nil {
+		return false, err
+	}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	internalclient := &http.Client{Transport: tr}
+	resp, err := internalclient.Do(httpReq)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return false, fmt.Errorf("unexpected response from door endpoint: %d - %s", resp.StatusCode, string(bodyBytes))
 	}
 	return true, nil
 }
