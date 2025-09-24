@@ -3,27 +3,27 @@
     {
       "biometric_device_id": "device1",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
-      "required_role": "AccessLevel1"
+      "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "device2",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
-      "required_role": "AccessLevel2"
+      "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "ladfklafd1434",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
-      "required_role": "AccessLevel1"
+      "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "3b440000-4020-11b5-83fd-2448454da1d4",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
-      "required_role": "AccessLevel1"
+      "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "11th-MainLift",
       "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
-      "required_role": "AccessLevel1"
+      "required_group": "app-biometric-access-control-1"
     }
   ]
 }

@@ -68,7 +68,7 @@ func (rm *RequirementsManager) GetConfiguredRequirementsFilePath() string {
 	return rm.ConfiguredFilePath
 }
 
-func (rm *RequirementsManager) GetRequiredRoleOfDevice(deviceId string) (string, error) {
+func (rm *RequirementsManager) GetRequiredGroupOfDevice(deviceId string) (string, error) {
 	if !rm.IsInitialized {
 		log.Println("Requirements manager is not initialized")
 		return "", fmt.Errorf("requirements manager is not initialized")
@@ -78,7 +78,7 @@ func (rm *RequirementsManager) GetRequiredRoleOfDevice(deviceId string) (string,
 		log.Printf("Device ID %s not found in access requirements", deviceId)
 		return "", fmt.Errorf("device ID %s not found in access requirements", deviceId)
 	}
-	return deviceData.RequiredRole, nil
+	return deviceData.RequiredGroup, nil
 }
 
 func (rm *RequirementsManager) GetDoorId(deviceId string) (string, error) {

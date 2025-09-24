@@ -83,24 +83,13 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	}
 	log.Println(deviceId)
 	resBody := gjson.ParseBytes(resBodyBytes)
-	lengthOfRoles := resBody.Get("Resources.0.roles.#").Int()
-	var roles []models.WSO2IDPRoleObject
-	for i := int64(0); i < lengthOfRoles; i++ {
-		roles = append(roles, models.WSO2IDPRoleObject{
-			Ref:             resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".$ref").String(),
-			AudienceDisplay: resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".audienceDisplay").String(),
-			AudienceType:    resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".audienceType").String(),
-			AudienceValue:   resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".audienceValue").String(),
-			Display:         resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".display").String(),
-			Value:           resBody.Get("Resources.0.roles." + strconv.Itoa(int(i)) + ".value").String(),
-		})
-	}
+	lengthOfGroups := resBody.Get("Resources.0.groups.#").Int()
 
-	var roleNames []string
-	for _, role := range roles {
-		roleNames = append(roleNames, role.GetRoleName())
+	var groupNames []string
+	for i := int64(0); i < lengthOfGroups; i++ {
+		groupNames = append(groupNames, resBody.Get("Resources.0.groups."+strconv.Itoa(int(i))+".display").String())
 	}
-	accessGranted, err := utils.RoleBasedAuthorization(deviceId, roleNames)
+	accessGranted, err := utils.GroupBasedAuthorization(deviceId, groupNames)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to authorize user for device access"})
 		return

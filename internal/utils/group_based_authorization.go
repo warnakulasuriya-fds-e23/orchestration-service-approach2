@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 )
 
-func RoleBasedAuthorization(deviceId string, userRoles []string) (bool, error) {
+func GroupBasedAuthorization(deviceId string, userGroups []string) (bool, error) {
 	access_granted := false
 	requirementsManager := GetRequirementsManager()
 	if !requirementsManager.IsInitialized {
@@ -12,13 +13,13 @@ func RoleBasedAuthorization(deviceId string, userRoles []string) (bool, error) {
 		return access_granted, err
 	}
 
-	requiredRole, err := requirementsManager.GetRequiredRoleOfDevice(deviceId)
+	requiredGroup, err := requirementsManager.GetRequiredGroupOfDevice(deviceId)
 	if err != nil {
-		err := fmt.Errorf("required role of device with device id %s couldn't be internally accessed: %v", deviceId, err)
+		err := fmt.Errorf("required Group of device with device id %s couldn't be internally accessed: %v", deviceId, err)
 		return access_granted, err
 	}
-	for _, userRole := range userRoles {
-		if userRole == requiredRole {
+	for _, userGroup := range userGroups {
+		if strings.Contains(userGroup, requiredGroup) {
 			access_granted = true
 			return access_granted, nil
 		}

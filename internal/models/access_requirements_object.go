@@ -7,14 +7,14 @@ type AccessRequirements struct {
 }
 
 type DeviceData struct {
-	DoorId       string `json:"doorId"`
-	RequiredRole string `json:"requiredRole"`
+	DoorId        string `json:"doorId"`
+	RequiredGroup string `json:"requiredGroup"`
 }
 
-// TODO: finalize get method to get the role with necessary error handling
-func (ar *AccessRequirements) GetRequiredRole(deviceId string) (role string, err error) {
+// TODO: finalize get method to get the group with necessary error handling
+func (ar *AccessRequirements) GetRequiredGroup(deviceId string) (group string, err error) {
 	deviceData := ar.Requirements[deviceId]
-	return deviceData.RequiredRole, nil
+	return deviceData.RequiredGroup, nil
 }
 func (ar *AccessRequirements) GetDoorId(deviceId string) (doorId string, err error) {
 	deviceData := ar.Requirements[deviceId]
