@@ -13,12 +13,17 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/models"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/internalkey"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/tokenstorage"
 )
 
 type AuthorizationController struct{}
 
 func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
+	if c.Request.Header.Get("Internal-API-Key") != internalkey.GetInternalAPIKey() {
+		c.JSON(403, gin.H{"error": "Forbidden"})
+		return
+	}
 	var reqBody models.SubmissionForAuthorization
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(400, gin.H{"error cannot bind json to incoming data from hikcentral format": err.Error()})

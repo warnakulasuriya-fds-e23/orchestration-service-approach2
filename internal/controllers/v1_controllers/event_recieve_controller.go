@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/internalkey"
 )
 
 type EventReceiveController struct{}
@@ -59,6 +60,7 @@ func (erc *EventReceiveController) ReceiveFaceMatchEvent(c *gin.Context) {
 			}
 
 			httpReq.Header.Set("Content-Type", "application/json")
+			httpReq.Header.Set("Internal-API-Key", internalkey.GetInternalAPIKey())
 			resp, err := internalclient.Do(httpReq)
 			if err != nil {
 				log.Printf("Error sending HTTP request: %v", err)
