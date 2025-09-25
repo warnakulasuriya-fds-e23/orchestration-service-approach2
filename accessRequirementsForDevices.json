@@ -6,17 +6,17 @@
       "required_group": "app-biometric-access-control-2"
     },
     {
-      "biometric_device_id": "device2",
+      "biometric_device_id": "6th-SecondaryLift",
       "door_id": "nsjfafjojsaofjsaofjaoijoagojnojfajaofjv",
       "required_group": "app-biometric-access-control-1"
     },
     {
-      "biometric_device_id": "ladfklafd1434",
+      "biometric_device_id": "7th-MainLift",
       "door_id": "zxdsvjsnvfnsonronganskfnknsfknknksknknv",
       "required_group": "app-biometric-access-control-1"
     },
     {
-      "biometric_device_id": "3b440000-4020-11b5-83fd-2448454da1d4",
+      "biometric_device_id": "8th-MainLift",
       "door_id": "ertyuioplkjjyuinisnvsinsfjvnsikvnsfvjsn",
       "required_group": "app-biometric-access-control-1"
     },
