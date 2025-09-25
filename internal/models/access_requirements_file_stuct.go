@@ -1,7 +1,7 @@
 package models
 
 type AccessRequirementsFileStruct struct {
-	Requirements []Requirement `json:"requirements"`
+	Policies []Requirement `json:"policies"`
 }
 
 type Requirement struct {

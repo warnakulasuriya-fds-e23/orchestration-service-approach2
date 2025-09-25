@@ -35,7 +35,7 @@ func ReadAccessRequirementsFile(requirementFilePath string) (models.AccessRequir
 
 	// Map the requirements from the file struct to the access requirements struct
 	accessRequirements.Requirements = make(map[string]models.DeviceData)
-	for _, requirement := range accessRequirementsFileStruct.Requirements {
+	for _, requirement := range accessRequirementsFileStruct.Policies {
 		accessRequirements.Requirements[requirement.BiometricDeviceId] = models.DeviceData{
 			DoorId:        requirement.DoorId,
 			RequiredGroup: requirement.RequiredGroup,

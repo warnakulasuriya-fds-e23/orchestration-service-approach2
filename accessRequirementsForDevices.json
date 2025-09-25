@@ -1,9 +1,9 @@
 {
-  "requirements": [
+  "policies": [
     {
       "biometric_device_id": "6th-MainLift",
       "door_id": "afdjlsnjfsnflsjfsfnfskjnskfvkfsvkjnknsf",
-      "required_group": "app-biometric-access-control-1"
+      "required_group": "app-biometric-access-control-2"
     },
     {
       "biometric_device_id": "device2",
