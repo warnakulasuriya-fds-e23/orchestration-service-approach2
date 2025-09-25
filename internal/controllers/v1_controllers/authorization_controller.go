@@ -20,43 +20,58 @@ import (
 type AuthorizationController struct{}
 
 func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
+	log.Println("--- 🔑 AUTHORIZATION REQUEST RECEIVED 🔑 ---")
+
 	if c.Request.Header.Get("Internal-API-Key") != internalkey.GetInternalAPIKey() {
+		log.Println("❌ ERROR: Forbidden. Invalid Internal-API-Key provided.")
 		c.JSON(403, gin.H{"error": "Forbidden"})
 		return
 	}
+
 	var reqBody models.SubmissionForAuthorization
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		log.Printf("❌ ERROR: Failed to bind JSON. Reason: %v", err)
 		c.JSON(400, gin.H{"error cannot bind json to incoming data from hikcentral format": err.Error()})
 		return
 	}
 
 	userName, err := reqBody.GetUserName()
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to get user name from request body. Reason: %v", err)
 		c.JSON(500, gin.H{"error while getting user ID from request body": err.Error()})
 		return
 	}
+	log.Printf("👤 User Name received: %s", userName)
 
 	deviceId, err := reqBody.GetDeviceId()
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to get device ID from request body. Reason: %v", err)
 		c.JSON(500, gin.H{"error while getting device ID from request body": err.Error()})
 		return
 	}
+	log.Printf("🚪 Device ID received: %s", deviceId)
 
 	idpAddress := os.Getenv("IDP_BASE_URL")
 	scimCallUrl, err := url.JoinPath(idpAddress, "/scim2/Users")
 	scimCallUrl = scimCallUrl + "?filter=userName+Co+\"" + userName + "\""
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to join URL path. Reason: %v", err)
 		c.JSON(500, gin.H{"error while joining URL path": err.Error()})
 		return
 	}
+	log.Printf("➡️ Sending request to IDP at: %s", scimCallUrl)
+
 	newRequest, err := http.NewRequest("GET", scimCallUrl, nil)
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to create new HTTP request. Reason: %v", err)
 		c.JSON(500, gin.H{"error while creating new request": err.Error()})
 		return
 	}
 	newRequest.Header.Set("Accept", "application/scim+json")
+
 	token, err := tokenstorage.GetTokenStorage().GetAccessToken()
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to get access token. Reason: %v", err)
 		c.JSON(500, gin.H{"error while getting access token": err.Error()})
 		return
 	}
@@ -66,53 +81,73 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	internalclient := &http.Client{Transport: tr}
 	resp, err := internalclient.Do(newRequest)
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to make request to IDP. Reason: %v", err)
 		c.JSON(500, gin.H{"error while making request to IDP": err.Error()})
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		c.JSON(resp.StatusCode, gin.H{"error": "Failed to authorize user", "details": resp.Status, "idpresponse": resp.Body})
+		log.Printf("⚠️ WARNING: IDP returned an unexpected status code: %d", resp.StatusCode)
 		resBodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
+			log.Printf("❌ ERROR: Failed to read IDP response body. Reason: %v", err)
 			c.JSON(500, gin.H{"error while reading response body": err.Error()})
 			return
 		}
-		log.Println("Response from IDP:", string(resBodyBytes))
+		log.Printf("IDP Response Body: %s", string(resBodyBytes))
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to authorize user", "details": resp.Status, "idpresponse": string(resBodyBytes)})
 		return
 	}
+
+	log.Println("✅ IDP responded with 200 OK. Reading response body...")
 	resBodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to read response body from IDP. Reason: %v", err)
 		c.JSON(500, gin.H{"error while reading response body": err.Error()})
 		return
 	}
-	log.Println(deviceId)
 	resBody := gjson.ParseBytes(resBodyBytes)
-	lengthOfGroups := resBody.Get("Resources.0.groups.#").Int()
+	log.Printf("IDP response body: %s", string(resBodyBytes))
 
+	lengthOfGroups := resBody.Get("Resources.0.groups.#").Int()
 	var groupNames []string
 	for i := int64(0); i < lengthOfGroups; i++ {
 		groupNames = append(groupNames, resBody.Get("Resources.0.groups."+strconv.Itoa(int(i))+".display").String())
 	}
+	log.Printf("👥 User belongs to the following groups: %v", groupNames)
+
 	accessGranted, err := utils.GroupBasedAuthorization(deviceId, groupNames)
 	if err != nil {
+		log.Printf("❌ ERROR: Group-based authorization failed. Reason: %v", err)
 		c.JSON(500, gin.H{"error": "Failed to authorize user for device access"})
 		return
 	}
+
 	if !accessGranted {
+		log.Println("⛔ ACCESS DENIED: User is not authorized for this device based on group membership.")
 		c.JSON(403, gin.H{"error": "User is not authorized to access this device"})
 		return
 	}
+
+	log.Println("✅ ACCESS GRANTED: User is authorized for this device.")
 	requirementManager := utils.GetRequirementsManager()
 	doorId, err := requirementManager.GetDoorId(deviceId)
 	if err != nil {
+		log.Printf("❌ ERROR: Failed to get door ID for device '%s'. Reason: %v", deviceId, err)
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Printf("🚪 Door ID '%s' found for device '%s'.", doorId, deviceId)
+
 	unlocked, err := utils.UnlockDoor(doorId)
 	if err != nil || !unlocked {
+		log.Printf("❌ ERROR: Failed to unlock door '%s'. Reason: %v", doorId, err)
 		c.JSON(500, gin.H{"error": "Failed to unlock the door"})
 		return
 	}
+	log.Println("🔓 SUCCESS: Door unlocked!")
+
+	log.Println("--- 🔓 AUTHORIZATION PROCESS COMPLETE 🔓 ---")
 	c.JSON(200, gin.H{"message": "User is authorized to access this device"})
 }
