@@ -1,28 +1,28 @@
 {
   "requirements": [
     {
-      "biometric_device_id": "device1",
-      "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
+      "biometric_device_id": "6th-MainLift",
+      "door_id": "afdjlsnjfsnflsjfsfnfskjnskfvkfsvkjnknsf",
       "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "device2",
-      "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
+      "door_id": "nsjfafjojsaofjsaofjaoijoagojnojfajaofjv",
       "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "ladfklafd1434",
-      "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
+      "door_id": "zxdsvjsnvfnsonronganskfnknsfknknksknknv",
       "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "3b440000-4020-11b5-83fd-2448454da1d4",
-      "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
+      "door_id": "ertyuioplkjjyuinisnvsinsfjvnsikvnsfvjsn",
       "required_group": "app-biometric-access-control-1"
     },
     {
       "biometric_device_id": "11th-MainLift",
-      "door_id": "hsfsfs-sffsnksf-sfknsf-isfkvsnv",
+      "door_id": "rosnvsjfnvskavjkjlfkdjsfkjsglsgjljslsfj",
       "required_group": "app-biometric-access-control-1"
     }
   ]
