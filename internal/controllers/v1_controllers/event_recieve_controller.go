@@ -97,7 +97,6 @@ func (erc *EventReceiveController) ReceiveFaceMatchEvent(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "successfully received event"})
 
 	} else {
-		log.Println("🗑️ IGNORING: Received a non-FaceMatch event or an unrecognized human ID.")
 		c.JSON(200, gin.H{"message": "event received but not processed as a valid FaceMatch event"})
 	}
 }
