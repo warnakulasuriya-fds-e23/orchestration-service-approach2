@@ -18,5 +18,6 @@ func SetupRoutes(router *gin.Engine) {
 		v1_routes.SetupAuthorizationRoutes(v1.Group("/authorization"))
 		v1_routes.SetupRequirementsRoutes(v1.Group("/requirements"))
 		v1_routes.SetupEventReceiveRoutes(v1.Group("/event-receive"))
+		v1_routes.SetupCacheEvictionRoutes(v1.Group("/cache-eviction"))
 	}
 }

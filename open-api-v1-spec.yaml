@@ -148,6 +148,49 @@ paths:
           description: Invalid request body
         '500':
           description: Internal server error
+  /api/v1/cache-eviction/evict-user-from-cache/{userName}:
+    delete:
+      tags: [cache-eviction]
+      summary: Evict user from cache
+      description: Removes the specified user from the Authorizations Cache.
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: Name of the user to evict from cache
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User cache evicted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User cache evicted successfully
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Failed to evict user from cache
 components:
   schemas:
     SubmissionForAuthorization:

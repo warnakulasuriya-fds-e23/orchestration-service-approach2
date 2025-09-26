@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/routes"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/authorizationscache"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/tokenstorage"
 )
 
@@ -35,6 +36,8 @@ func main() {
 		log.Println("failed to initialize requirements manager")
 		return
 	}
+	// Initialize authorizations cache
+	_ = authorizationscache.GetAuthorizationsCacheInstance()
 
 	// streamlisteners.StartAlertStreamListener(os.Getenv("ALERT_STREAM_ENDPOINT"))
 	// Initialize Gin router

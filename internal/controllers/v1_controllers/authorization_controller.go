@@ -13,6 +13,7 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/models"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils"
+	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/authorizationscache"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/internalkey"
 	"github.com/warnakulasuriya-fds-e23/orchestration-service-approach2/internal/utils/tokenstorage"
 )
@@ -51,6 +52,31 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	}
 	log.Printf("🚪 Device ID received: %s", deviceId)
 
+	requirementManager := utils.GetRequirementsManager()
+	doorId, err := requirementManager.GetDoorId(deviceId)
+	if err != nil {
+		log.Printf("❌ ERROR: Failed to get door ID for device '%s'. Reason: %v", deviceId, err)
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	// check AuthorizationsCache
+	cachedAuth := authorizationscache.GetAuthorizationsCacheInstance()
+	if cachedAuth.IsAuthorized(userName, doorId) {
+		log.Printf("✅ CACHE HIT: User '%s' is already authorized for door '%s'.", userName, doorId)
+
+		unlocked, err := utils.UnlockDoor(doorId)
+		if err != nil || !unlocked {
+			log.Printf("❌ ERROR: Failed to unlock door '%s'. Reason: %v", doorId, err)
+			c.JSON(500, gin.H{"error": "Failed to unlock the door"})
+			return
+		}
+		log.Println("🔓 SUCCESS: Door unlocked!")
+
+		log.Println("--- 🔓 AUTHORIZATION PROCESS COMPLETE 🔓 ---")
+		c.JSON(200, gin.H{"message": "User is authorized to access this device"})
+	}
+
+	log.Printf("🚪 Door ID '%s' found for device '%s'.", doorId, deviceId)
 	idpAddress := os.Getenv("IDP_BASE_URL")
 	scimCallUrl, err := url.JoinPath(idpAddress, "/scim2/Users")
 	scimCallUrl = scimCallUrl + "?filter=userName+Co+\"" + userName + "\""
@@ -131,14 +157,9 @@ func (ac *AuthorizationController) AuthorizeUserForDoorAccess(c *gin.Context) {
 	}
 
 	log.Println("✅ ACCESS GRANTED: User is authorized for this device.")
-	requirementManager := utils.GetRequirementsManager()
-	doorId, err := requirementManager.GetDoorId(deviceId)
-	if err != nil {
-		log.Printf("❌ ERROR: Failed to get door ID for device '%s'. Reason: %v", deviceId, err)
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	log.Printf("🚪 Door ID '%s' found for device '%s'.", doorId, deviceId)
+
+	// cache the authorization
+	cachedAuth.SetAuthorization(userName, doorId)
 
 	unlocked, err := utils.UnlockDoor(doorId)
 	if err != nil || !unlocked {

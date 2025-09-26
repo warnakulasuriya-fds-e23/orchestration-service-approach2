@@ -24,6 +24,7 @@ type tokenResponseObject struct {
 	ErrorDescription string `json:"error_description,omitempty"`
 }
 
+// TokenStorage is to be used to manage the token that will be used to call the IDP
 type TokenStorage struct {
 	accessToken string
 	expiryTime  time.Time
